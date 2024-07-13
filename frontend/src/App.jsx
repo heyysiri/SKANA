@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState } from 'react'
-import NavBar from './Components/Navbar'
+import NavBar from './Components/NavBar'
 import { useNavigate } from 'react-router-dom';
 import StyleHeader from './Components/StyleHeader'
 
