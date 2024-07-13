@@ -6,11 +6,7 @@ import { getAuthenticated, setAuthenticated } from '../utils/auth';
 import { useNavigate } from 'react-router-dom';
 
 function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
-  const [name, setName] = useState('SiriK');
-  const [email, setEmail] = useState('siri@gmail.com');
-  const [password, setPassword] = useState('');
-  const [maskedPassword, setMaskedPassword] = useState('');
-  const [actualPassword, setActualPassword] = useState('yourActualPassword');
+  const [userData, setUserData] = useState(null);
   const [editingField, setEditingField] = useState(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [promptField, setPromptField] = useState(null);
@@ -18,10 +14,12 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
   const fileInputRef = useRef(null);
   const navi = useNavigate();
   
-
   useEffect(() => {
-    setMaskedPassword('*'.repeat(actualPassword.length));
-  }, [actualPassword]);
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUserData(JSON.parse(storedUser));
+    }
+  }, []);
 
   const handleEdit = (field) => {
     setEditingField(field);
@@ -41,16 +39,17 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
   };
 
   const handleConfirm = () => {
-    if (promptField === 'email') {
-      setEmail(newValue);
-    } else if (promptField === 'password') {
-      setActualPassword(newValue);
-      setMaskedPassword('*'.repeat(newValue.length));
-    }
+    updateUserData();
     setShowPrompt(false);
     setEditingField(null);
     setPromptField(null);
     setNewValue('');
+  };
+  const updateUserData = () => {
+    const updatedUserData = { ...userData, [editingField]: newValue };
+    setUserData(updatedUserData);
+    localStorage.setItem('user', JSON.stringify(updatedUserData));
+    setEditingField(null);
   };
 
   const handleCancel = () => {
@@ -86,10 +85,13 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
 
   const handleSignOut = () => {
     setAuthenticated(false);
+    localStorage.removeItem('user');
     console.log("Signed out. New auth status:", getAuthenticated());
     onClose();
-    navi('/');
+    navigate('/');
   }
+   
+  if (!userData) return null;
 
   return (
     <>
@@ -118,20 +120,21 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
               />
             </div>
             <div className="space-y-4">
-              {['name', 'email', 'password'].map((field, index) => (
+            {['name', 'email', 'password'].map((field, index) => (
                 <div key={field} className={`bg-white/20 rounded-lg p-3 flex items-center justify-between backdrop-filter backdrop-blur-sm transition-all duration-300 ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`} style={{transitionDelay: `${(index + 1) * 100}ms`}}>
                   <div className="flex-grow">
                     <label className="block text-xs font-medium text-gray-200 mb-1">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
                     {editingField === field ? (
                       <input
-                        type={field === 'password' ? 'text' : 'text'}
-                        value={field === 'password' ? password : eval(field)}
-                        onChange={(e) => field === 'password' ? setPassword(e.target.value) : eval(`set${field.charAt(0).toUpperCase() + field.slice(1)}(e.target.value)`)}
+                        type={field === 'password' ? 'password' : 'text'}
+                        value={newValue}
+                        onChange={(e) => setNewValue(e.target.value)}
                         className="bg-transparent border-b border-gray-300 text-white text-sm focus:outline-none focus:border-yellow-400 w-full"
                       />
                     ) : (
-                      <p className="text-sm">{field === 'password' ? maskedPassword : eval(field)}</p>
-                    )}
+                      <p className="text-sm">
+  {field === 'password' ? '********' : userData[field]}
+</p> )}
                   </div>
                   {editingField === field ? (
                     <button onClick={handleSave} className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors duration-200">
