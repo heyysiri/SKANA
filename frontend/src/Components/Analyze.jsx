@@ -3,14 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import NavBar from './NavBar';
-import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaCode, FaRocket, FaBrain, FaChartLine } from 'react-icons/fa';
+import { SkillsVisualization } from './SkillsVisualization';
+import { FaCode, FaRocket } from 'react-icons/fa';
 import { Radar } from 'react-chartjs-2';
 import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
-import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
-import { Link } from 'react-router-dom';
-
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 const SkillCheckbox = ({ skill, completed, onToggle }) => (
   <div className="flex items-center mb-2">
@@ -108,7 +105,7 @@ function Analyze() {
       const skillsToImproveCount = response.data.skills_to_improve.length;
       setSkillsToImprove(skillsToImproveCount);
 
-      const newMarketFit = Math.round(((data.response.skills_to_improve + 1) / totalRequiredSkills) * 100);
+      const newMarketFit = Math.round(((skillsToImproveCount + 1) / totalRequiredSkills) * 100);
       setMarketFit(newMarketFit);
 
       setSkills(response.data.skills_to_improve.map((skill, index) => ({
@@ -220,13 +217,7 @@ function Analyze() {
           <div className="md:flex space-x-8">
             <div className="md:w-2/3">
               {/* Skills Assessment Visualization */}
-              <div className="mb-8 bg-black bg-opacity-50 p-8 rounded-3xl shadow-2xl border border-yellow-500/30 backdrop-blur-sm">
-                <h3 className="text-3xl font-semibold text-yellow-400 mb-4 font-sans">Skills Assessment</h3>
-                <div className="mb-6 bg-gray-900 p-6 rounded-xl" style={{ height: '300px' }}>
-                  <Radar data={skillsData} options={{ maintainAspectRatio: false, scales: { r: { ticks: { beginAtZero: true, max: 5, stepSize: 1 }, angleLines: { color: 'rgba(255, 255, 255, 0.1)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } } } }} />
-                </div>
-              </div>
-              
+              {analysisResult && <SkillsVisualization analysisResult={analysisResult} />}
               {/* Recommended Improvements */}
               <div className="mb-8 bg-black bg-opacity-50 p-8 rounded-3xl shadow-2xl border border-yellow-500/30 backdrop-blur-sm">
                 <h3 className="text-3xl font-semibold text-yellow-400 mb-4 font-sans">Recommended Improvements</h3>
@@ -292,40 +283,6 @@ function Analyze() {
           </div>
         </div>
         
-        {/* Career Progress Timeline */}
-        <div className="mt-8 p-6 bg-black bg-opacity-50 rounded-3xl shadow-2xl border border-yellow-500/30 backdrop-blur-sm">
-          <h3 className="text-3xl font-semibold text-yellow-400 mb-8 font-sans text-center">Career Progress</h3>
-          <VerticalTimeline layout="1-column" lineColor="rgba(251, 191, 36, 0.3)">
-            <VerticalTimelineElement
-              className="vertical-timeline-element--work"
-              contentStyle={{ background: 'rgba(31, 41, 55, 0.8)', color: '#fff', boxShadow: '0 3px 0 #fbbf24', borderRadius: '15px' }}
-              contentArrowStyle={{ borderRight: '7px solid rgba(31, 41, 55, 0.8)' }}
-              date="2021 - present"
-              iconStyle={{ background: '#fbbf24', color: '#1f2937' }}
-              icon={<FaRocket />}
-            >
-              <h3 className="text-yellow-400 text-xl font-bold mb-1 font-sans">Senior Developer</h3>
-              <h4 className="text-gray-300 font-sans">Tech Corp</h4>
-              <p className="text-gray-400 font-sans">
-                Led team in developing scalable web applications using React and Node.js
-              </p>
-            </VerticalTimelineElement>
-            <VerticalTimelineElement
-              className="vertical-timeline-element--work"
-              contentStyle={{ background: 'rgba(31, 41, 55, 0.8)', color: '#fff', boxShadow: '0 3px 0 #fbbf24', borderRadius: '15px' }}
-              contentArrowStyle={{ borderRight: '7px solid rgba(31, 41, 55, 0.8)' }}
-              date="2018 - 2021"
-              iconStyle={{ background: '#fbbf24', color: '#1f2937' }}
-              icon={<FaCode />}
-            >
-              <h3 className="text-yellow-400 text-xl font-bold mb-1 font-sans">Full Stack Developer</h3>
-              <h4 className="text-gray-300 font-sans">Web Solutions Inc.</h4>
-              <p className="text-gray-400 font-sans">
-                Developed and maintained various client projects using MERN stack
-              </p>
-            </VerticalTimelineElement>
-          </VerticalTimeline>
-        </div>
       </div>
     </div>
   );
@@ -333,5 +290,4 @@ function Analyze() {
 
 
 export default Analyze;
-
 
