@@ -9,4 +9,4 @@ export const setAuthenticated = (status) => {
     const status = localStorage.getItem('isAuthenticated') === 'true';
     console.log("Getting authentication status:", status);
     return status;
-  };
+  }; 

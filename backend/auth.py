@@ -55,7 +55,6 @@ def signup():
         print(f"Error inserting user: {e}")
         return jsonify({'message': 'Error creating user'}), 500
 
-
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -67,7 +66,11 @@ def login():
     
     user = users_collection.find_one({'email': email})
     if user and check_password_hash(user['password'], password):
-        return jsonify({'message': 'Login successful'}), 200
+        user_data = {
+            'name': user['name'],
+            'email': user['email']
+        }
+        return jsonify({'message': 'Login successful', 'user': user_data}), 200
     else:
         return jsonify({'message': 'Invalid email or password'}), 401
 

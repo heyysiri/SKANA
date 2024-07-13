@@ -28,6 +28,7 @@ const SignIn = () => {
             );
             console.log('Login successful:', response.data.message);
             setAuthenticated(true);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
             console.log("Signed in. New auth status:", getAuthenticated());
             navi('/');
         } catch (error) {

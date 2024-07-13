@@ -8,6 +8,7 @@ function NavBar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState(null);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -15,6 +16,14 @@ function NavBar() {
     const authStatus = getAuthenticated();
     console.log("Current auth status:", authStatus);
     setIsAuthenticated(authStatus);
+    if (authStatus) {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        setUserData(JSON.parse(storedUser));
+      }
+    } else {
+      setUserData(null);
+    }
   }, []);
 
   useEffect(() => {
@@ -54,6 +63,8 @@ function NavBar() {
   const handleSignOut = () => {
     setAuthenticated(false);
     setIsAuthenticated(false);
+    localStorage.removeItem('user');
+    setUserData(null);
     console.log("Signed out. New auth status:", getAuthenticated());
     navigate('/');
   };
@@ -94,14 +105,14 @@ function NavBar() {
               </button>
               {dropdownOpen && (
                 <div
-                  ref={dropdownRef}
-                  className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 dark:bg-gray-700 dark:divide-gray-600"
-                  id="user-dropdown"
-                >
-                  <div className="px-4 py-3">
-                    <span className="block text-sm text-gray-900 dark:text-white">SiriK</span>
-                    <span className="block text-sm text-gray-500 truncate dark:text-gray-400">siri@gmail.com</span>
-                  </div>
+                ref={dropdownRef}
+                className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 dark:bg-gray-700 dark:divide-gray-600"
+                id="user-dropdown"
+              >
+                <div className="px-4 py-3">
+                  <span className="block text-sm text-gray-900 dark:text-white">{userData.name}</span>
+                  <span className="block text-sm text-gray-500 truncate dark:text-gray-400">{userData.email}</span>
+                </div>
                   <ul className="py-2" aria-labelledby="user-menu-button">
                     <li>
                       <a 
