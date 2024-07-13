@@ -30,21 +30,31 @@ def signup():
     
     data = request.get_json()
     print(f"Received data: {data}")
+    name = data.get('name')
     email = data.get('email')
     password = data.get('password')
     
-    if not email or not password:
-        print(f"Missing email or password. Email: {email}, Password: {'*' * len(password) if password else None}")
-        return jsonify({'message': 'Email and password are required'}), 400
+    if not name or not email or not password:
+        print(f"Missing name, email or password. Name: {name}, Email: {email}, Password: {'*' * len(password) if password else None}")
+        return jsonify({'message': 'Name, email, and password are required'}), 400
     
     hashed_password = generate_password_hash(password)
     try:
-        result = users_collection.insert_one({'email': email, 'password': hashed_password})
+        user_data = {
+            'name': name,
+            'email': email,
+            'password': hashed_password,
+            'job': '',
+            'skills': [],
+            'skills_to_improve': []
+        }
+        result = users_collection.insert_one(user_data)
         print(f"Insertion result: {result.inserted_id}")
         return jsonify({'message': 'Signup successful'}), 201
     except Exception as e:
         print(f"Error inserting user: {e}")
         return jsonify({'message': 'Error creating user'}), 500
+
 
 @app.route('/api/login', methods=['POST'])
 def login():

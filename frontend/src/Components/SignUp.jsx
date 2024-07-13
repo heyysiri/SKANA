@@ -25,7 +25,7 @@ function SignUp() {
         try {
             const response = await axios.post(
                 'http://localhost:5000/api/signup',
-                { email, password },
+                { name,email, password },
                 { headers: { 'Content-Type': 'application/json' } }
             );
             console.log('Signup successful:', response.data.message);

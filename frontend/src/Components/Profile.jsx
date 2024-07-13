@@ -48,7 +48,7 @@ function Profile() {
               <div className="absolute -bottom-3 -right-3 bg-yellow-400 rounded-full p-3 shadow-lg">
                 <FaCode className="text-black" size={24} />
               </div>
-            </div>
+            </div> 
             <h2 className="text-5xl font-bold text-yellow-400 text-center mb-3 font-sans">Jane Doe</h2>
             <p className="text-white text-center text-2xl mb-4 font-sans">Software Developer</p>
             <p className="text-gray-300 text-center italic mb-8 font-sans text-lg">"Catchy Tagline!"</p>

@@ -38,7 +38,7 @@ function NavBar() {
   }, []);
 
   return (
-    <nav className="z-10 bg-black h-32">
+    <nav className="z-10 bg-black h-32 z-10">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <a className="flex items-center space-x-3 rtl:space-x-reverse">
           {/* <img src={Logo} className="h-16 w-20" alt="Skana Logo" /> */}
