@@ -102,15 +102,13 @@ function Analyze() {
 
       const totalRequiredSkills = response.data.skills_required_in_job.length;
       const matchingSkillsCount = response.data.matching_skills.length;
-      const newMatchRate = Math.round((matchingSkillsCount / totalRequiredSkills) * 100);
+      const newMatchRate = Math.round(((matchingSkillsCount + 1) / totalRequiredSkills) * 100);
       setMatchRate(newMatchRate);
 
-      // Set skills to improve
       const skillsToImproveCount = response.data.skills_to_improve.length;
       setSkillsToImprove(skillsToImproveCount);
 
-      // Calculate market fit
-      const newMarketFit = Math.round((matchingSkillsCount / (totalRequiredSkills)) * 100);
+      const newMarketFit = Math.round(((data.response.skills_to_improve + 1) / totalRequiredSkills) * 100);
       setMarketFit(newMarketFit);
 
       setSkills(response.data.skills_to_improve.map((skill, index) => ({
@@ -182,20 +180,38 @@ function Analyze() {
           {analysisResult && (
             <div className="mb-8 bg-black bg-opacity-50 p-8 rounded-3xl shadow-2xl border border-yellow-500/30 backdrop-blur-sm">
               <h2 className="text-5xl font-bold text-yellow-400 text-center mb-4 font-sans">Analysis Dashboard</h2>
-              <div className="flex justify-center space-x-8 mb-8">
-                <div className="text-center">
-                  <div className="text-6xl font-bold text-white mb-2">{animatedNumber}%</div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div className="text-center bg-gray-800 p-6 rounded-xl transform hover:scale-105 transition-all duration-300">
+                  <div className="text-6xl font-bold text-white mb-2">{matchRate}%</div>
                   <div className="text-yellow-400">Match Rate</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-6xl font-bold text-white mb-2">{analysisResult.skills_to_improve.length}</div>
+                <div className="text-center bg-gray-800 p-6 rounded-xl transform hover:scale-105 transition-all duration-300">
+                  <div className="text-6xl font-bold text-white mb-2">{skillsToImprove}</div>
                   <div className="text-yellow-400">Skills to Improve</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-6xl font-bold text-white mb-2">
-                    {Math.round((analysisResult.matching_skills.length / analysisResult.skills_required_in_job.length) * 100)}%
-                  </div>
+                <div className="text-center bg-gray-800 p-6 rounded-xl transform hover:scale-105 transition-all duration-300">
+                  <div className="text-6xl font-bold text-white mb-2">{marketFit}%</div>
                   <div className="text-yellow-400">Market Fit</div>
+                </div>
+              </div>
+              
+              {/* Skills Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-gray-800 p-6 rounded-xl">
+                  <h3 className="text-2xl font-semibold text-yellow-400 mb-4">Your Skills</h3>
+                  <ul className="list-disc list-inside">
+                    {analysisResult.skills_from_resume.map((skill, index) => (
+                      <li key={index} className="text-white mb-2">{skill}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-gray-800 p-6 rounded-xl">
+                  <h3 className="text-2xl font-semibold text-yellow-400 mb-4">Required Skills</h3>
+                  <ul className="list-disc list-inside">
+                    {analysisResult.skills_required_in_job.map((skill, index) => (
+                      <li key={index} className="text-white mb-2">{skill}</li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>
@@ -317,4 +333,5 @@ function Analyze() {
 
 
 export default Analyze;
+
 
