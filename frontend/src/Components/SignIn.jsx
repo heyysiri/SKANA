@@ -4,13 +4,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import Logo from '../assets/Logo.png'
+import { getAuthenticated, setAuthenticated } from '../utils/auth';
 
 const SignIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navi = useNavigate();
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -27,6 +27,8 @@ const SignIn = () => {
                 { headers: { 'Content-Type': 'application/json' } }
             );
             console.log('Login successful:', response.data.message);
+            setAuthenticated(true);
+            console.log("Signed in. New auth status:", getAuthenticated());
             navi('/');
         } catch (error) {
             console.error('Login failed:', error);

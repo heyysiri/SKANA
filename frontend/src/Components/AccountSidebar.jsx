@@ -2,6 +2,8 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import profileImg from '../assets/image.png';
+import { getAuthenticated, setAuthenticated } from '../utils/auth';
+import { useNavigate } from 'react-router-dom';
 
 function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
   const [name, setName] = useState('SiriK');
@@ -14,6 +16,8 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
   const [promptField, setPromptField] = useState(null);
   const [newValue, setNewValue] = useState('');
   const fileInputRef = useRef(null);
+  const navi = useNavigate();
+  
 
   useEffect(() => {
     setMaskedPassword('*'.repeat(actualPassword.length));
@@ -80,6 +84,13 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
     }
   };
 
+  const handleSignOut = () => {
+    setAuthenticated(false);
+    console.log("Signed out. New auth status:", getAuthenticated());
+    onClose();
+    navi('/');
+  }
+
   return (
     <>
       {isOpen && (
@@ -138,7 +149,7 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
                 </div>
               ))}
               <div className={`pt-6 transition-all duration-300 ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`} style={{transitionDelay: '400ms'}}>
-                <button onClick={() => {}} className="w-full bg-yellow-500 text-white py-3 px-6 rounded-lg hover:from-red-600/90 hover:to-pink-600/90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 text-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                <button onClick={handleSignOut} className="w-full bg-yellow-500 text-white py-3 px-6 rounded-lg hover:from-red-600/90 hover:to-pink-600/90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 text-lg font-semibold transition-all duration-200 transform hover:scale-105">
                   Sign Out
                 </button>
               </div>
