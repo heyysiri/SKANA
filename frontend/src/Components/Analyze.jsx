@@ -1,6 +1,8 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import NavBar from './Navbar';
+import NavBar from './NavBar';
 import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaCode, FaRocket, FaBrain, FaChartLine } from 'react-icons/fa';
 import { Radar } from 'react-chartjs-2';
 import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeline-component';

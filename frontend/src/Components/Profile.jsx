@@ -1,5 +1,7 @@
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import NavBar from './Navbar';
+import NavBar from './NavBar';
 import profileImg from '../assets/image.png';
 import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaCode, FaPlus } from 'react-icons/fa';
 import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeline-component';
