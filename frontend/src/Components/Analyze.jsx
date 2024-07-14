@@ -57,6 +57,7 @@ function Analyze() {
   const [matchRate, setMatchRate] = useState(0);
   const [marketFit, setMarketFit] = useState(0);
   const [skillsToImprove, setSkillsToImprove] = useState(0);
+  const [loadingSkills, setLoadingSkills] = useState({});
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -155,22 +156,25 @@ function Analyze() {
   const sendSkillToBackend = async (e, skillName) => {
     e.preventDefault();
     console.log('Sending skill:', skillName);
+    setLoadingSkills(prev => ({ ...prev, [skillName]: true }));
     try {
       const response = await axios.post('http://localhost:5500/recommend_course', 
         { resource: skillName },
         { headers: { 'Content-Type': 'application/json' } }
       );
       console.log('Received from backend:', response.data);
-    if (response.data.recommendation) {
-      window.open(response.data.recommendation, '_blank');
-    } else {
-      console.error('No recommendation received');
-    }
+      if (response.data.recommendation) {
+        window.open(response.data.recommendation, '_blank');
+      } else {
+        console.error('No recommendation received');
+      }
     } catch (error) {
       console.error('Error sending skill:', error);
       if (error.response) {
         console.error('Error details:', error.response.data);
       }
+    } finally {
+      setLoadingSkills(prev => ({ ...prev, [skillName]: false }));
     }
   };
   
@@ -262,13 +266,18 @@ function Analyze() {
                       <span className={`font-sans text-lg ${highlightedSkill === skill.name ? 'text-black' : 'text-gray-300'}`}>
                         {skill.name}
                       </span>
-                      <a 
-                        //href="#"
+                      <button 
                         onClick={(e) => sendSkillToBackend(e, skill.name)}
-                        className={`inline-block ${skill.completed ? 'bg-gray-600' : 'bg-blue-500 hover:bg-blue-600'} text-white text-sm font-bold py-2 px-4 rounded transition-colors duration-300`}
+                        className={`inline-block ${skill.completed ? 'bg-gray-600' : 'bg-blue-500 hover:bg-blue-600'} text-white text-sm font-bold py-2 px-4 rounded transition-colors duration-300 cursor-pointer`}
+                        disabled={loadingSkills[skill.name]}
                       >
-                        Resource
-                      </a>
+                        {loadingSkills[skill.name] ? (
+                          <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                        ) : 'resource'}
+                      </button>
                     </div>
                   ))}
                 </div>
