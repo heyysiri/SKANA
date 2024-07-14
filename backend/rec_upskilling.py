@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from rec_courses import recommend_course
+from backend.rec_courses import recommend_course
 import pandas as pd
 
 app = Flask(__name__)

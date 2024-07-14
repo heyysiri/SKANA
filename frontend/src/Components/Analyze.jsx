@@ -4,9 +4,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import NavBar from './NavBar';
 import { SkillsVisualization } from './SkillsVisualization';
-import { FaCode, FaRocket } from 'react-icons/fa';
-import { Radar } from 'react-chartjs-2';
-import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 
 const SkillCheckbox = ({ skill, completed, onToggle }) => (
@@ -66,7 +63,7 @@ function Analyze() {
     const savedMatchRate = localStorage.getItem('matchRate');
     const savedMarketFit = localStorage.getItem('marketFit');
     const savedSkillsToImprove = localStorage.getItem('skillsToImprove');
-
+  
     if (savedAnalysisResult) {
       setAnalysisResult(JSON.parse(savedAnalysisResult));
       setSkills(JSON.parse(savedSkills));
@@ -75,20 +72,26 @@ function Analyze() {
       setMarketFit(JSON.parse(savedMarketFit));
       setSkillsToImprove(JSON.parse(savedSkillsToImprove));
     }
-
+  }, []); // This effect runs only once on component mount
+  
+  useEffect(() => {
     const intervalId = setInterval(() => {
-      setHighlightedSkill(skills[Math.floor(Math.random() * skills.length)]?.name);
+      setHighlightedSkill(prevSkill => {
+        const newSkill = skills[Math.floor(Math.random() * skills.length)]?.name;
+        return newSkill !== prevSkill ? newSkill : prevSkill;
+      });
     }, 2000);
-
+  
+    return () => clearInterval(intervalId);
+  }, [skills]); // This effect depends on skills, but won't cause unnecessary re-renders
+  
+  useEffect(() => {
     const animationId = setInterval(() => {
       setAnimatedNumber(prev => (prev + 1) % 101);
     }, 50);
-
-    return () => {
-      clearInterval(intervalId);
-      clearInterval(animationId);
-    };
-  }, [skills]);
+  
+    return () => clearInterval(animationId);
+  }, []); // This effect runs independently of other state
 
   const handleResumeChange = (e) => {
     setResume(e.target.files[0]);
@@ -107,7 +110,7 @@ function Analyze() {
     formData.append('job_description', jobDescription);
 
     try {
-      const response = await axios.post('http://localhost:5001/skill-analyzer', formData, {
+      const response = await axios.post('http://localhost:5000/skill-analyzer', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -186,7 +189,7 @@ function Analyze() {
     console.log('Sending skill:', skillName);
     setLoadingSkills(prev => ({ ...prev, [skillName]: true }));
     try {
-      const response = await axios.post('http://localhost:5500/recommend_course', 
+      const response = await axios.post('http://localhost:5000/recommend_course', 
         { resource: skillName },
         { headers: { 'Content-Type': 'application/json' } }
       );

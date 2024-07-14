@@ -18,7 +18,7 @@ const SignIn = () => {
             setError('Email and password are required');
             return;
         }
-        console.log('Sending login request with:', { email, password });
+        //console.log('Sending login request with:', { email, password });
 
         try {
             const response = await axios.post(
@@ -26,7 +26,7 @@ const SignIn = () => {
                 { email, password },
                 { headers: { 'Content-Type': 'application/json' } }
             );
-            console.log('Login successful:', response.data.message);
+            //console.log('Login successful:', response.data.message);
             setAuthenticated(true);
             localStorage.setItem('user', JSON.stringify(response.data.user));
             console.log("Signed in. New auth status:", getAuthenticated());
