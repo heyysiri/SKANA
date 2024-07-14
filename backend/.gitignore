@@ -2,4 +2,4 @@ __pycache__
 analyzer.py
 auth.py
 rec_upskilling.py
-mgstring.py
+.env

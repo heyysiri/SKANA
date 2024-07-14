@@ -13,11 +13,14 @@ import re
 from groq import Groq
 import pandas as pd
 from rec_courses import recommend_course
-from mgstring import connec_string, groq_api
+#from mgstring import connec_string, groq_api
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 CORS(app)
-
+load_dotenv()
+connec_string = os.getenv('connec_string')
+groq_api = os.getenv('groq_api')
 # Connect to MongoDB
 client = MongoClient(connec_string)
 
