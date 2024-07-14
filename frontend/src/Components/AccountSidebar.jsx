@@ -1,9 +1,8 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import profileImg from '../assets/image.png';
 import { getAuthenticated, setAuthenticated } from '../utils/auth';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
   const [userData, setUserData] = useState(null);
@@ -12,7 +11,7 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
   const [promptField, setPromptField] = useState(null);
   const [newValue, setNewValue] = useState('');
   const fileInputRef = useRef(null);
-  const navi = useNavigate();
+  const navigate = useNavigate();
   
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -22,40 +21,46 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
   }, []);
 
   const handleEdit = (field) => {
-    setEditingField(field);
-    if (field === 'password') {
-      setPassword(actualPassword);
+    if (field !== 'email') {
+      setEditingField(field);
+      setNewValue(field === 'password' ? '' : userData[field]);
     }
   };
 
   const handleSave = () => {
-    if (editingField === 'email' || editingField === 'password') {
-      setPromptField(editingField);
-      setNewValue(editingField === 'password' ? password : eval(editingField));
-      setShowPrompt(true);
-    } else {
-      setEditingField(null);
+    setPromptField(editingField);
+    setShowPrompt(true);
+  };
+
+  const updateUserData = async () => {
+    try {
+      const response = await axios.put('http://localhost:5000/api/user/update', {
+        email: userData.email,
+        field: editingField,
+        value: newValue
+      });
+  
+      if (response.status === 200) {
+        const updatedUserData = { ...userData, [editingField]: newValue };
+        setUserData(updatedUserData);
+        localStorage.setItem('user', JSON.stringify(updatedUserData));
+        setEditingField(null);
+      } else {
+        console.error('Failed to update user data');
+      }
+    } catch (error) {
+      console.error('Error updating user data:', error);
     }
   };
 
   const handleConfirm = () => {
     updateUserData();
     setShowPrompt(false);
-    setEditingField(null);
     setPromptField(null);
     setNewValue('');
   };
-  const updateUserData = () => {
-    const updatedUserData = { ...userData, [editingField]: newValue };
-    setUserData(updatedUserData);
-    localStorage.setItem('user', JSON.stringify(updatedUserData));
-    setEditingField(null);
-  };
 
   const handleCancel = () => {
-    if (editingField === 'password') {
-      setPassword(maskedPassword);
-    }
     setShowPrompt(false);
     setEditingField(null);
     setPromptField(null);
@@ -89,7 +94,7 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
     console.log("Signed out. New auth status:", getAuthenticated());
     onClose();
     navigate('/');
-  }
+  };
    
   if (!userData) return null;
 
@@ -120,34 +125,39 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
               />
             </div>
             <div className="space-y-4">
-            {['name', 'email', 'password'].map((field, index) => (
-                <div key={field} className={`bg-white/20 rounded-lg p-3 flex items-center justify-between backdrop-filter backdrop-blur-sm transition-all duration-300 ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`} style={{transitionDelay: `${(index + 1) * 100}ms`}}>
-                  <div className="flex-grow">
-                    <label className="block text-xs font-medium text-gray-200 mb-1">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
-                    {editingField === field ? (
-                      <input
-                        type={field === 'password' ? 'password' : 'text'}
-                        value={newValue}
-                        onChange={(e) => setNewValue(e.target.value)}
-                        className="bg-transparent border-b border-gray-300 text-white text-sm focus:outline-none focus:border-yellow-400 w-full"
-                      />
-                    ) : (
-                      <p className="text-sm">
-  {field === 'password' ? '********' : userData[field]}
-</p> )}
-                  </div>
-                  {editingField === field ? (
-                    <button onClick={handleSave} className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors duration-200">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </button>
-                  ) : (
-                    <button onClick={() => handleEdit(field)} className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors duration-200">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    </button>
+        {['name', 'email', 'password'].map((field, index) => (
+          <div key={field} className={`bg-white/20 rounded-lg p-3 flex items-center justify-between backdrop-filter backdrop-blur-sm transition-all duration-300 ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`} style={{transitionDelay: `${(index + 1) * 100}ms`}}>
+            <div className="flex-grow">
+              <label className="block text-xs font-medium text-gray-200 mb-1">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+              {editingField === field ? (
+                <input
+                  type={field === 'password' ? 'password' : 'text'}
+                  value={newValue}
+                  onChange={(e) => setNewValue(e.target.value)}
+                  className="bg-transparent border-b border-gray-300 text-white text-sm focus:outline-none focus:border-yellow-400 w-full"
+                />
+              ) : (
+                <p className="text-sm">
+                  {field === 'password' ? '********' : userData[field]}
+                </p>
+              )}
+            </div>
+            {field !== 'email' && (
+              <>
+                {editingField === field ? (
+                  <button onClick={handleSave} className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </button>
+                ) : (
+                  <button onClick={() => handleEdit(field)} className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                )}
+                    </>
                   )}
                 </div>
               ))}

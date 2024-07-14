@@ -152,6 +152,36 @@ def update_job():
         return jsonify({'message': 'Job updated successfully'}), 200
     else:
         return jsonify({'message': 'Failed to update job'}), 500
+    
+@app.route('/api/user/update', methods=['PUT'])
+def update_user():
+    data = request.get_json()
+    email = data.get('email')
+    field = data.get('field')
+    new_value = data.get('value')
+    
+    if not email or not field or new_value is None:
+        return jsonify({'message': 'Email, field, and new value are required'}), 400
+    
+    if field not in ['name', 'password']:
+        return jsonify({'message': 'Only name and password can be updated'}), 400
+
+    update_data = {}
+    
+    if field == 'password':
+        update_data[field] = generate_password_hash(new_value)
+    else:  # field is 'name'
+        update_data[field] = new_value
+    
+    result = users_collection.update_one(
+        {'email': email},
+        {'$set': update_data}
+    )
+    
+    if result.modified_count:
+        return jsonify({'message': f'{field.capitalize()} updated successfully'}), 200
+    else:
+        return jsonify({'message': f'Failed to update {field}'}), 500
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
