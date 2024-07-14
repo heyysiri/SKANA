@@ -13,13 +13,20 @@ function Profile() {
   const [position, setPosition] = useState('');
   const [tagline, setTagline] = useState('"Catchy Tagline!"');
   const [error, setError] = useState(null);
-
+  const [userName, setUserName] = useState('User');
   useEffect(() => {
+    fetchUserName();
     fetchPosition();
     fetchTagline();
     fetchSkills();
   }, []);
-  
+  const fetchUserName = () => {
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      const user = JSON.parse(userString);
+      setUserName(user.name || 'User');
+    }
+  };
   const fetchPosition = async () => {
     try {
       const userString = localStorage.getItem('user');
@@ -179,7 +186,7 @@ const saveTagline = async () => {
                 <FaCode className="text-black" size={24} />
               </div>
             </div> 
-            <h2 className="text-5xl font-bold text-yellow-400 text-center mb-3 font-sans">Jane Doe</h2>
+            <h2 className="text-5xl font-bold text-yellow-400 text-center mb-3 font-sans">{userName}</h2>
             {isEditing ? (
         <div className="space-y-2">
           <input
