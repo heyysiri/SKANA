@@ -1,5 +1,5 @@
 // auth.js or auth.jsx
-
+localStorage.setItem('isAuthenticated', 'false');
 export const setAuthenticated = (status) => {
     console.log("Setting authentication status to:", status);
     localStorage.setItem('isAuthenticated', status.toString());
