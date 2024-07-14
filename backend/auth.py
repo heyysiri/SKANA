@@ -117,6 +117,42 @@ def add_skill():
         return jsonify({'message': 'Skill added successfully', 'skill': skill_object}), 201
     else:
         return jsonify({'message': 'Failed to add skill'}), 500
+    
+@app.route('/api/user/job', methods=['GET'])
+def get_job():
+    name = request.args.get('name')
+    if not name:
+        return jsonify({'message': 'Name is required'}), 400
+    
+    user = users_collection.find_one({'name': name})
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+    
+    job = user.get('job', '')
+    if job == '':
+        job = 'Developer'  # Set default job
+    
+    return jsonify({'job': job}), 200
+
+@app.route('/api/user/job', methods=['POST'])
+def update_job():
+    data = request.get_json()
+    name = data.get('name')
+    new_job = data.get('job')
+    
+    if not name or new_job is None:
+        return jsonify({'message': 'Name and job are required'}), 400
+    
+    result = users_collection.update_one(
+        {'name': name},
+        {'$set': {'job': new_job}}
+    )
+    
+    if result.modified_count:
+        return jsonify({'message': 'Job updated successfully'}), 200
+    else:
+        return jsonify({'message': 'Failed to update job'}), 500
+
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

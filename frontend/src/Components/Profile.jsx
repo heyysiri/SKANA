@@ -10,13 +10,52 @@ function Profile() {
   const [newSkill, setNewSkill] = useState('');
   const [skills, setSkills] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [position, setPosition] = useState('Software Developer');
+  const [position, setPosition] = useState('');
   const [tagline, setTagline] = useState('"Catchy Tagline!"');
   const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchSkills();
+    fetchPosition();
   }, []);
+
+  const fetchPosition = async () => {
+    try {
+      const userString = localStorage.getItem('user');
+      const user = userString ? JSON.parse(userString) : null;
+      if (!user || !user.name) {
+        console.error('User name not found in local storage');
+        return;
+      }
+      
+      const response = await axios.get(`http://localhost:5000/api/user/job?name=${encodeURIComponent(user.name)}`);
+      if (response.data && response.data.job) {
+        setPosition(response.data.job);
+      }
+    } catch (error) {
+      console.error('Error fetching position:', error);
+      setPosition('Developer');  // Set default job if there's an error
+    }
+  };
+  
+  const savePosition = async () => {
+    try {
+      const userString = localStorage.getItem('user');
+      const user = userString ? JSON.parse(userString) : null;
+      if (!user || !user.name) {
+        console.error('User name not found in local storage');
+        return;
+      }
+      
+      await axios.post('http://localhost:5000/api/user/job', { 
+        name: user.name, 
+        job: position || 'Developer'  // Send 'Developer' if position is empty
+      });
+      console.log('Position updated successfully');
+    } catch (error) {
+      console.error('Error saving position:', error);
+    }
+  };
 
   const fetchSkills = async () => {
     try {
@@ -74,8 +113,12 @@ function Profile() {
 
   const handleInputBlur = () => {
     setIsEditing(false);
-  };
-
+    if (position.trim() === '') {
+      setPosition('Developer');  // Set default job if input is empty
+    }
+    savePosition();
+  };  
+  
   if (error) {
     return <div className="text-red-500 text-center mt-10">{error}</div>;
   }
@@ -87,8 +130,7 @@ function Profile() {
         {/* Profile and Skills section */}
         <div className="w-full lg:w-1/2 space-y-8">
           {/* Profile Box */}
-          <div className="bg-black rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-all duration-300 border border-yellow-500/30 hover:border-yellow-500 relative">
-            <button 
+          <div className="bg-black bg-opacity-50 rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-all duration-300 border border-yellow-500/30 hover:border-yellow-500 backdrop-blur-sm">            <button 
               onClick={handleEdit}
               className="absolute top-4 left-4 bg-yellow-400 p-2 rounded-full hover:bg-yellow-500 transition-all duration-300 transform hover:scale-110 shadow-lg"
             >
@@ -138,8 +180,7 @@ function Profile() {
           </div>
             
           {/* Skills List */}
-          <div className="bg-black rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-all duration-300 border border-yellow-500/30 hover:border-yellow-500">
-            <h3 className="text-4xl font-semibold text-yellow-400 mb-8 font-sans">Skills</h3>
+          <div className="bg-black bg-opacity-50 rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-all duration-300 border border-yellow-500/30 hover:border-yellow-500 backdrop-blur-sm">            <h3 className="text-4xl font-semibold text-yellow-400 mb-8 font-sans">Skills</h3>
             <div className="grid grid-cols-2 gap-6">
               {skills.map((skill, index) => (
                 <div 
@@ -155,8 +196,7 @@ function Profile() {
           </div>
         </div>
 
-        <div className="w-full lg:w-1/2 p-6 bg-black rounded-3xl shadow-2xl border border-yellow-500/30">
-          <h3 className="text-4xl font-semibold text-yellow-400 mb-8 font-sans text-center">Timeline</h3>
+        <div className="w-full lg:w-1/2 p-6 bg-black bg-opacity-50 rounded-3xl shadow-2xl border border-yellow-500/30 backdrop-blur-sm">          <h3 className="text-4xl font-semibold text-yellow-400 mb-8 font-sans text-center">Timeline</h3>
           <VerticalTimeline layout="1-column" lineColor="rgba(251, 191, 36, 0.3)">
             {/* Add Skill Input */}
             <VerticalTimelineElement
@@ -178,17 +218,10 @@ function Profile() {
                   value={newSkill}
                   onChange={(e) => setNewSkill(e.target.value)}
                   className="w-full p-3 bg-transparent text-yellow-400 text-2l font-bold mb-1 font-sans border-b-2 border-yellow-400 focus:outline-none focus:border-yellow-500 transition-all duration-300"
-                  placeholder="Enter new skill"
+                  placeholder="Press Enter to add a new skill"
                 />
-                <button 
-                  type="submit" 
-                  className="mt-2 bg-yellow-400 text-black font-bold py-2 px-4 rounded hover:bg-yellow-500 transition-colors duration-300"
-                >
-                  Add Skill
-                </button>
               </form>
             </VerticalTimelineElement>
-
             {/* Existing Skills */}
             {skills.map((skill, index) => (
               <VerticalTimelineElement
