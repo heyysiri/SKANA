@@ -1,5 +1,5 @@
 __pycache__
-analyzer
-auth
-rec_upskilling
-mgstring
+analyzer.py
+auth.py
+rec_upskilling.py
+mgstring.py
