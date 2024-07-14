@@ -398,5 +398,5 @@ def recommend_course_api():
     
     return jsonify({'recommendation': recommended_link})
 
-if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+# if __name__ == '__main__':
+#     app.run(port=5000, debug=True)
