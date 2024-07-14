@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import NavBar from './NavBar';
@@ -36,7 +37,7 @@ function Profile() {
         return;
       }
       
-      const response = await axios.get(`http://localhost:5000/api/user/job?email=${encodeURIComponent(user.email)}`);
+      const response = await axios.get(`https://skana.onrender.com/api/user/job?email=${encodeURIComponent(user.email)}`);
       if (response.data && response.data.job) {
         setPosition(response.data.job);
       }
@@ -57,7 +58,7 @@ function Profile() {
       
       const jobToSave = position.trim() || 'Developer';
       
-      await axios.post('http://localhost:5000/api/user/job', { 
+      await axios.post('https://skana.onrender.com/api/user/job', { 
         email: user.email, 
         job: jobToSave
       });
@@ -78,7 +79,7 @@ function Profile() {
         return;
       }
       
-      const response = await axios.get(`http://localhost:5000/api/skills?email=${encodeURIComponent(user.email)}`);
+      const response = await axios.get(`https://skana.onrender.com/api/skills?email=${encodeURIComponent(user.email)}`);
       if (response.data && Array.isArray(response.data.skills)) {
         setSkills(response.data.skills);
       } else {
@@ -100,7 +101,7 @@ function Profile() {
           console.error('User email not found in local storage');
           return;
         }
-        const response = await axios.post('http://localhost:5000/api/skills', { 
+        const response = await axios.post('https://skana.onrender.com/api/skills', { 
           email: user.email, 
           skill: newSkill.trim() 
         });
@@ -120,7 +121,7 @@ const fetchTagline = async () => {
     if (!user || !user.email) {
       throw new Error('User email not found');
     }
-    const response = await axios.get(`http://localhost:5000/api/user/tagline?email=${encodeURIComponent(user.email)}`);
+    const response = await axios.get(`https://skana.onrender.com/api/user/tagline?email=${encodeURIComponent(user.email)}`);
     setTagline(response.data.tagline);
   } catch (error) {
     console.error('Error fetching tagline:', error);
@@ -135,7 +136,7 @@ const saveTagline = async () => {
     if (!user || !user.email) {
       throw new Error('User email not found');
     }
-    await axios.post('http://localhost:5000/api/user/tagline', {
+    await axios.post('https://skana.onrender.com/api/user/tagline', {
       email: user.email,
       tagline: tagline
     });

@@ -36,7 +36,7 @@ function AccountSidebar({ isOpen, onClose }) {
 
   const updateUserData = async () => {
     try {
-      const response = await axios.put('http://localhost:5000/api/user/update', {
+      const response = await axios.put('https://skana.onrender.com/api/user/update', {
         email: userData.email,
         field: editingField,
         value: newValue

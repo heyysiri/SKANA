@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 
 function StyleHeader() {
-  const words = ['Upload', 'Analyze', 'Upskill', 'Thrive'];
+  const words = ['Upload', 'Analyze', 'Upskill'];
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const periodClass = 'text-7xl text-yellow-500'
   useEffect(() => {

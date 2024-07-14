@@ -110,7 +110,7 @@ function Analyze() {
     formData.append('job_description', jobDescription);
 
     try {
-      const response = await axios.post('http://localhost:5000/skill-analyzer', formData, {
+      const response = await axios.post('https://skana.onrender.com/skill-analyzer', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -189,7 +189,7 @@ function Analyze() {
     console.log('Sending skill:', skillName);
     setLoadingSkills(prev => ({ ...prev, [skillName]: true }));
     try {
-      const response = await axios.post('http://localhost:5000/recommend_course', 
+      const response = await axios.post('https://skana.onrender.com/recommend_course', 
         { resource: skillName },
         { headers: { 'Content-Type': 'application/json' } }
       );
