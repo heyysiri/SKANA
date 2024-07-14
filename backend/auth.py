@@ -48,7 +48,8 @@ def signup():
             'password': hashed_password,
             'job': '',
             'skills': [],
-            'skills_to_improve': []
+            'skills_to_improve': [],
+            'tagline': 'A catchy tagline!'
         }
         result = users_collection.insert_one(user_data)
         print(f"Insertion result: {result.inserted_id}")
@@ -70,7 +71,8 @@ def login():
     if user and check_password_hash(user['password'], password):
         user_data = {
             'name': user['name'],
-            'email': user['email']
+            'email': user['email'],
+            'tagline': user.get('tagline', 'A catchy tagline!') 
         }
         return jsonify({'message': 'Login successful', 'user': user_data}), 200
     else:
@@ -182,6 +184,40 @@ def update_user():
         return jsonify({'message': f'{field.capitalize()} updated successfully'}), 200
     else:
         return jsonify({'message': f'Failed to update {field}'}), 500
+
+@app.route('/api/user/tagline', methods=['GET'])
+def get_tagline():
+    email = request.args.get('email')
+    if not email:
+        return jsonify({'message': 'Email is required'}), 400
+    
+    user = users_collection.find_one({'email': email})
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+    
+    tagline = user.get('tagline', 'A catchy tagline!')
+    
+    return jsonify({'tagline': tagline}), 200
+
+@app.route('/api/user/tagline', methods=['POST'])
+def update_tagline():
+    data = request.get_json()
+    email = data.get('email')
+    new_tagline = data.get('tagline')
+    
+    if not email or new_tagline is None:
+        return jsonify({'message': 'Email and tagline are required'}), 400
+    
+    result = users_collection.update_one(
+        {'email': email},
+        {'$set': {'tagline': new_tagline}}
+    )
+    
+    if result.modified_count:
+        return jsonify({'message': 'Tagline updated successfully'}), 200
+    else:
+        return jsonify({'message': 'Failed to update tagline'}), 500
+
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

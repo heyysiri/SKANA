@@ -16,6 +16,7 @@ function Profile() {
 
   useEffect(() => {
     fetchPosition();
+    fetchTagline();
     fetchSkills();
   }, []);
   
@@ -104,6 +105,39 @@ function Profile() {
     }
   };
   
+
+  // Fetch tagline
+const fetchTagline = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.email) {
+      throw new Error('User email not found');
+    }
+    const response = await axios.get(`http://localhost:5000/api/user/tagline?email=${encodeURIComponent(user.email)}`);
+    setTagline(response.data.tagline);
+  } catch (error) {
+    console.error('Error fetching tagline:', error);
+    setTagline('A catchy tagline!');
+  }
+};
+
+// Update tagline
+const saveTagline = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.email) {
+      throw new Error('User email not found');
+    }
+    await axios.post('http://localhost:5000/api/user/tagline', {
+      email: user.email,
+      tagline: tagline
+    });
+    console.log('Tagline updated successfully');
+  } catch (error) {
+    console.error('Error saving tagline:', error);
+  }
+};
+
   const handleEdit = () => {
     setIsEditing(!isEditing);
   };
@@ -111,8 +145,11 @@ function Profile() {
   const handleInputBlur = () => {
     setIsEditing(false);
     const updatedPosition = position.trim() || 'Developer';
-    setPosition(updatedPosition);
-    savePosition();
+  const updatedTagline = tagline.trim() || 'A catchy tagline!';
+  setPosition(updatedPosition);
+  setTagline(updatedTagline);
+  savePosition();
+  saveTagline();
   };
 
   if (error) {
@@ -144,28 +181,28 @@ function Profile() {
             </div> 
             <h2 className="text-5xl font-bold text-yellow-400 text-center mb-3 font-sans">Jane Doe</h2>
             {isEditing ? (
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={position}
-                onChange={(e) => setPosition(e.target.value)}
-                onBlur={handleInputBlur}
-                className="w-full bg-transparent text-white text-center text-2xl py-1 px-2 rounded-lg font-sans border-b border-yellow-400 focus:outline-none focus:border-yellow-500"
-              />
-                <input
-                  type="text"
-                  value={tagline}
-                  onChange={(e) => setTagline(e.target.value)}
-                  onBlur={handleInputBlur}
-                  className="w-full bg-transparent text-gray-300 text-center italic py-1 px-2 rounded-lg font-sans text-lg border-b border-yellow-400 focus:outline-none focus:border-yellow-500"
-                />
-              </div>
-            ) : (
-              <>
-                <p className="text-white text-center text-2xl mb-4 font-sans">{position}</p>
-                <p className="text-gray-300 text-center italic mb-8 font-sans text-lg">{tagline}</p>
-              </>
-            )}
+        <div className="space-y-2">
+          <input
+            type="text"
+            value={position}
+            onChange={(e) => setPosition(e.target.value)}
+            onBlur={handleInputBlur}
+            className="w-full bg-transparent text-white text-center text-2xl py-1 px-2 rounded-lg font-sans border-b border-yellow-400 focus:outline-none focus:border-yellow-500"
+          />
+          <input
+            type="text"
+            value={tagline}
+            onChange={(e) => setTagline(e.target.value)}
+            onBlur={handleInputBlur}
+            className="w-full bg-transparent text-gray-300 text-center italic py-1 px-2 rounded-lg font-sans text-lg border-b border-yellow-400 focus:outline-none focus:border-yellow-500"
+          />
+        </div>
+      ) : (
+        <>
+          <p className="text-white text-center text-2xl mb-4 font-sans">{position}</p>
+          <p className="text-gray-300 text-center italic mb-8 font-sans text-lg">{tagline}</p>
+        </>
+      )}
             <div className="flex justify-center space-x-6">
               {[FaGithub, FaLinkedin, FaTwitter, FaEnvelope].map((Icon, index) => (
                 <a key={index} href="#" className="bg-gray-800 p-4 rounded-full hover:bg-yellow-400 transition-all duration-300 transform hover:scale-110 shadow-lg">
