@@ -170,21 +170,24 @@ const saveTagline = async () => {
         {/* Profile and Skills section */}
         <div className="w-full lg:w-1/2 space-y-8">
           {/* Profile Box */}
-          <div className="bg-black bg-opacity-50 rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-all duration-300 border border-yellow-500/30 hover:border-yellow-500 backdrop-blur-sm">            <button 
+          <div className="bg-black bg-opacity-50 rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-all duration-300 border border-yellow-500/30 hover:border-yellow-500 backdrop-blur-sm">
+            <button 
               onClick={handleEdit}
               className="absolute top-4 left-4 bg-yellow-400 p-2 rounded-full hover:bg-yellow-500 transition-all duration-300 transform hover:scale-110 shadow-lg"
             >
               <FaEdit className="text-black" size={20} />
             </button>
             <div className="relative w-48 h-48 mx-auto mb-8">
-              <img 
-                src={profileImg}
-                alt="Profile" 
-                className="w-full h-full rounded-full object-cover border-4 border-yellow-400 shadow-lg"
-              />
-              <div className="absolute -bottom-3 -right-3 bg-yellow-400 rounded-full p-3 shadow-lg">
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-100 via-violet-500 to-blue-700 flex items-center justify-center shadow-lg overflow-hidden">
+                <div className="absolute inset-0 bg-black opacity-10"></div>
+                <span className="text-7xl font-extrabold text-white relative z-10 font-sans tracking-wider">
+                  {userName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div className="absolute -bottom-3 -right-3 bg-yellow-400 rounded-full p-3 shadow-lg transform rotate-12 transition-transform duration-300 hover:rotate-0">
                 <FaCode className="text-black" size={24} />
               </div>
+              <div className="absolute top-0 left-0 w-full h-full border-4 border-yellow-300 rounded-full opacity-50 animate-pulse"></div>
             </div> 
             <h2 className="text-5xl font-bold text-yellow-400 text-center mb-3 font-sans">{userName}</h2>
             {isEditing ? (

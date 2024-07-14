@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import profileImg from '../assets/image.png';
 import AccountSidebar from './AccountSidebar';
 import { getAuthenticated, setAuthenticated } from '../utils/auth';
+import { FaCode } from 'react-icons/fa';
 
 function NavBar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -110,7 +111,11 @@ function NavBar() {
                 onClick={toggleDropdown}
               >
                 <span className="sr-only">Open user menu</span>
-                <img className="w-8 h-8 rounded-full" src={profileImg} alt="user photo" />
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 via-violet-500 to-blue-700 flex items-center justify-center">
+                  <span className="text-xl font-bold text-white">
+                    {userData?.name?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
               </button>
               {dropdownOpen && (
                 <div
