@@ -3,12 +3,19 @@ import { useState } from 'react'
 import NavBar from './Components/NavBar'
 import { useNavigate } from 'react-router-dom';
 import StyleHeader from './Components/StyleHeader'
+import { getAuthenticated, setAuthenticated } from './utils/auth';
 
 function App() {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate('/analyze');
+    const isAuthenticated = getAuthenticated(); // Retrieve authentication status
+    
+    if (!isAuthenticated) {
+      navigate('/SignIn'); // Navigate to SignIn if not authenticated
+    } else {
+      navigate('/Analyze'); // Navigate to analyze if authenticated
+    }
   };
 
   return (

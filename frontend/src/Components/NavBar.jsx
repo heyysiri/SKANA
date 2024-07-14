@@ -12,6 +12,15 @@ function NavBar() {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
+  const handleAnalyze = () => {
+    const isAuthenticated = getAuthenticated(); // Retrieve authentication status
+    if (isAuthenticated) {
+      navigate('/Analyze'); // Navigate to SignIn if not authenticated
+    } else {
+      navigate('/SignIn'); // Navigate to analyze if authenticated
+    }
+  }
+
   const checkAuthStatus = useCallback(() => {
     const authStatus = getAuthenticated();
     console.log("Current auth status:", authStatus);
@@ -85,9 +94,9 @@ function NavBar() {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-yellow-400 transition-all duration-500 group-hover:w-full"></span>
             </li>
             <li className="relative group">
-              <Link to="/analyze" className="py-2 px-3 text-4xl font-mono">
+              <button onClick={handleAnalyze} className="py-2 px-3 text-4xl font-mono">
                 Analyze
-              </Link>
+              </button>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-yellow-400 transition-all duration-500 group-hover:w-full"></span>
             </li>
           </ul>
