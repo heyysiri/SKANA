@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import profileImg from '../assets/image.png';
 import { getAuthenticated, setAuthenticated } from '../utils/auth';
@@ -12,6 +14,7 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
   const [newValue, setNewValue] = useState('');
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -89,10 +92,12 @@ function AccountSidebar({ isOpen, onClose, profileImage, setProfileImage }) {
   };
 
   const handleSignOut = () => {
-    setAuthenticated(false);
-    localStorage.removeItem('user');
-    console.log("Signed out. New auth status:", getAuthenticated());
     onClose();
+    setAuthenticated(false);
+    setIsAuthenticated(false);
+    localStorage.removeItem('user');
+    setUserData(null);
+    console.log("Signed out. New auth status:", getAuthenticated());
     navigate('/');
   };
    
