@@ -306,46 +306,40 @@ function Analyze() {
                 </div>
               </div>
             </div>
-            
+            {/* Skills Checklist and Estimated Study Time */}
             <div className="md:w-1/3">
-              {/* Recent Applications */}
-              <div className="mb-8 bg-black bg-opacity-50 p-8 rounded-3xl shadow-2xl border border-yellow-500/30 backdrop-blur-sm">
-                <h3 className="text-3xl font-semibold text-yellow-400 mb-4 font-sans">Recent Applications</h3>
-                <div className="mb-6 space-y-4">
-                  <div className="bg-gray-800 p-4 rounded-xl transition-all duration-300 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:scale-105">
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-gray-300">Senior Developer at Tech Co.</span>
-                      <span className="text-green-500">85% Match</span>
-                    </div>
-                    <p className="text-sm text-gray-400">Applied on: July 1, 2024</p>
-                  </div>
-                  <div className="bg-gray-800 p-4 rounded-xl transition-all duration-300 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:scale-105">
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-gray-300">Full Stack Engineer at Startup Inc.</span>
-                      <span className="text-yellow-500">70% Match</span>
-                    </div>
-                    <p className="text-sm text-gray-400">Applied on: June 15, 2024</p>
-                  </div>
+              <div className="mb-8 bg-black bg-opacity-50 p-6 rounded-3xl shadow-2xl border border-yellow-500/30 backdrop-blur-sm">
+                <h3 className="text-2xl font-semibold text-yellow-400 mb-3 font-sans">Skills to Improve</h3>
+                <div className="max-h-60 overflow-y-auto">
+                  {skills.map((skill) => (
+                    <SkillCheckbox 
+                      key={skill.id}
+                      skill={skill.name}
+                      completed={skill.completed}
+                      onToggle={() => toggleSkill(skill.id)}
+                    />
+                  ))}
                 </div>
               </div>
 
-              {/* Skills Checklist */}
-              <div className="mb-8 bg-black bg-opacity-50 p-8 rounded-3xl shadow-2xl border border-yellow-500/30 backdrop-blur-sm">
-                <h3 className="text-3xl font-semibold text-yellow-400 mb-4 font-sans">Skills to Improve</h3>
-                {skills.map((skill) => (
-                  <SkillCheckbox 
-                    key={skill.id}
-                    skill={skill.name}
-                    completed={skill.completed}
-                    onToggle={() => toggleSkill(skill.id)}
-                  />
-                ))}
+              {/* Estimated Study Time */}
+              <div className="mb-8 bg-black bg-opacity-50 p-6 rounded-3xl shadow-2xl border border-yellow-500/30 backdrop-blur-sm">
+                <h3 className="text-2xl font-semibold text-yellow-400 mb-3 font-sans">Estimated Study Time</h3>
+                <p className="text-white text-lg">
+                  Total time to master all skills: 
+                </p>
+                <p className="text-yellow-400 text-3xl font-bold mt-2">
+                  ~{skills.length * 10} hours
+                </p>
+                <p className="text-gray-400 text-sm mt-2">
+                  (Assuming an average of 10 hours per skill)
+                </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
   );
 }
 
