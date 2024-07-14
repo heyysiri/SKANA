@@ -78,11 +78,11 @@ def login():
     
 @app.route('/api/skills', methods=['GET'])
 def get_skills():
-    name = request.args.get('name')
-    if not name:
-        return jsonify({'message': 'Name is required'}), 400
+    email = request.args.get('email')
+    if not email:
+        return jsonify({'message': 'Email is required'}), 400
     
-    user = users_collection.find_one({'name': name})
+    user = users_collection.find_one({'email': email})
     if not user:
         return jsonify({'message': 'User not found'}), 404
     
@@ -92,13 +92,13 @@ def get_skills():
 @app.route('/api/skills', methods=['POST'])
 def add_skill():
     data = request.get_json()
-    name = data.get('name')
+    email = data.get('email')
     new_skill = data.get('skill')
     
-    if not name or not new_skill:
-        return jsonify({'message': 'Name and skill are required'}), 400
+    if not email or not new_skill:
+        return jsonify({'message': 'Email and skill are required'}), 400
     
-    user = users_collection.find_one({'name': name})
+    user = users_collection.find_one({'email': email})
     if not user:
         return jsonify({'message': 'User not found'}), 404
     
@@ -109,7 +109,7 @@ def add_skill():
     }
     
     result = users_collection.update_one(
-        {'name': name},
+        {'email': email},
         {'$push': {'skills': skill_object}}
     )
     
@@ -117,14 +117,14 @@ def add_skill():
         return jsonify({'message': 'Skill added successfully', 'skill': skill_object}), 201
     else:
         return jsonify({'message': 'Failed to add skill'}), 500
-    
+        
 @app.route('/api/user/job', methods=['GET'])
 def get_job():
-    name = request.args.get('name')
-    if not name:
-        return jsonify({'message': 'Name is required'}), 400
+    email = request.args.get('email')
+    if not email:
+        return jsonify({'message': 'Email is required'}), 400
     
-    user = users_collection.find_one({'name': name})
+    user = users_collection.find_one({'email': email})
     if not user:
         return jsonify({'message': 'User not found'}), 404
     
@@ -137,14 +137,14 @@ def get_job():
 @app.route('/api/user/job', methods=['POST'])
 def update_job():
     data = request.get_json()
-    name = data.get('name')
+    email = data.get('email')
     new_job = data.get('job')
     
-    if not name or new_job is None:
-        return jsonify({'message': 'Name and job are required'}), 400
+    if not email or new_job is None:
+        return jsonify({'message': 'Email and job are required'}), 400
     
     result = users_collection.update_one(
-        {'name': name},
+        {'email': email},
         {'$set': {'job': new_job}}
     )
     
@@ -152,7 +152,36 @@ def update_job():
         return jsonify({'message': 'Job updated successfully'}), 200
     else:
         return jsonify({'message': 'Failed to update job'}), 500
+    
+@app.route('/api/user/update', methods=['PUT'])
+def update_user():
+    data = request.get_json()
+    email = data.get('email')
+    field = data.get('field')
+    new_value = data.get('value')
+    
+    if not email or not field or new_value is None:
+        return jsonify({'message': 'Email, field, and new value are required'}), 400
+    
+    if field not in ['name', 'password']:
+        return jsonify({'message': 'Only name and password can be updated'}), 400
 
+    update_data = {}
+    
+    if field == 'password':
+        update_data[field] = generate_password_hash(new_value)
+    else:  # field is 'name'
+        update_data[field] = new_value
+    
+    result = users_collection.update_one(
+        {'email': email},
+        {'$set': update_data}
+    )
+    
+    if result.modified_count:
+        return jsonify({'message': f'{field.capitalize()} updated successfully'}), 200
+    else:
+        return jsonify({'message': f'Failed to update {field}'}), 500
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

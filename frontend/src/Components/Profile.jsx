@@ -15,20 +15,20 @@ function Profile() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchSkills();
     fetchPosition();
+    fetchSkills();
   }, []);
-
+  
   const fetchPosition = async () => {
     try {
       const userString = localStorage.getItem('user');
       const user = userString ? JSON.parse(userString) : null;
-      if (!user || !user.name) {
-        console.error('User name not found in local storage');
+      if (!user || !user.email) {
+        console.error('User email not found in local storage');
         return;
       }
       
-      const response = await axios.get(`http://localhost:5000/api/user/job?name=${encodeURIComponent(user.name)}`);
+      const response = await axios.get(`http://localhost:5000/api/user/job?email=${encodeURIComponent(user.email)}`);
       if (response.data && response.data.job) {
         setPosition(response.data.job);
       }
@@ -42,41 +42,38 @@ function Profile() {
     try {
       const userString = localStorage.getItem('user');
       const user = userString ? JSON.parse(userString) : null;
-      if (!user || !user.name) {
-        console.error('User name not found in local storage');
+      if (!user || !user.email) {
+        console.error('User email not found in local storage');
         return;
       }
       
+      const jobToSave = position.trim() || 'Developer';
+      
       await axios.post('http://localhost:5000/api/user/job', { 
-        name: user.name, 
-        job: position || 'Developer'  // Send 'Developer' if position is empty
+        email: user.email, 
+        job: jobToSave
       });
       console.log('Position updated successfully');
+      setPosition(jobToSave); // Update the state immediately
+      fetchPosition(); // Refetch to ensure we have the latest data
     } catch (error) {
       console.error('Error saving position:', error);
     }
   };
-
+  
   const fetchSkills = async () => {
     try {
       const userString = localStorage.getItem('user');
-      console.log('User string from localStorage:', userString);
       const user = userString ? JSON.parse(userString) : null;
-      console.log('Parsed user object:', user);
-      
-      if (!user || !user.name) {
-        console.error('User name not found in local storage');
+      if (!user || !user.email) {
+        console.error('User email not found in local storage');
         return;
       }
       
-      console.log('Fetching skills for user:', user.name);
-      const response = await axios.get(`http://localhost:5000/api/skills?name=${encodeURIComponent(user.name)}`);
-      console.log('Skills response:', response.data);
-      
+      const response = await axios.get(`http://localhost:5000/api/skills?email=${encodeURIComponent(user.email)}`);
       if (response.data && Array.isArray(response.data.skills)) {
         setSkills(response.data.skills);
       } else {
-        console.error('Unexpected response format:', response.data);
         setSkills([]);
       }
     } catch (error) {
@@ -84,41 +81,40 @@ function Profile() {
       setSkills([]);
     }
   };
-
+  
   const addNewSkill = async (e) => {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
     if (newSkill.trim() !== '') {
       try {
         const userString = localStorage.getItem('user');
         const user = userString ? JSON.parse(userString) : null;
-        if (!user || !user.name) {
-          console.error('User name not found in local storage');
+        if (!user || !user.email) {
+          console.error('User email not found in local storage');
           return;
         }
         const response = await axios.post('http://localhost:5000/api/skills', { 
-          name: user.name, 
+          email: user.email, 
           skill: newSkill.trim() 
         });
-        setSkills([response.data.skill, ...skills]);
+        setSkills([...skills, response.data.skill]);
         setNewSkill('');
       } catch (error) {
         console.error('Error adding new skill:', error);
       }
     }
   };
-
+  
   const handleEdit = () => {
     setIsEditing(!isEditing);
   };
 
   const handleInputBlur = () => {
     setIsEditing(false);
-    if (position.trim() === '') {
-      setPosition('Developer');  // Set default job if input is empty
-    }
+    const updatedPosition = position.trim() || 'Developer';
+    setPosition(updatedPosition);
     savePosition();
-  };  
-  
+  };
+
   if (error) {
     return <div className="text-red-500 text-center mt-10">{error}</div>;
   }
@@ -148,14 +144,14 @@ function Profile() {
             </div> 
             <h2 className="text-5xl font-bold text-yellow-400 text-center mb-3 font-sans">Jane Doe</h2>
             {isEditing ? (
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  value={position}
-                  onChange={(e) => setPosition(e.target.value)}
-                  onBlur={handleInputBlur}
-                  className="w-full bg-transparent text-white text-center text-2xl py-1 px-2 rounded-lg font-sans border-b border-yellow-400 focus:outline-none focus:border-yellow-500"
-                />
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+                onBlur={handleInputBlur}
+                className="w-full bg-transparent text-white text-center text-2xl py-1 px-2 rounded-lg font-sans border-b border-yellow-400 focus:outline-none focus:border-yellow-500"
+              />
                 <input
                   type="text"
                   value={tagline}
