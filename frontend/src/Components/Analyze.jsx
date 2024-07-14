@@ -9,6 +9,7 @@ import { Radar } from 'react-chartjs-2';
 import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 
+
 const SkillCheckbox = ({ skill, completed, onToggle }) => (
   <div className="flex items-center mb-2">
     <div 
@@ -114,6 +115,7 @@ function Analyze() {
         completed: false,
       })));
 
+
       setSkillsData({
         labels: response.data.skills_required_in_job,
         datasets: [
@@ -149,6 +151,33 @@ function Analyze() {
       skill.id === id ? { ...skill, completed: !skill.completed } : skill
     ));
   };
+
+  const sendSkillToBackend = async (e, skillName) => {
+    e.preventDefault();
+    console.log('Sending skill:', skillName);
+    try {
+      const response = await axios.post('http://localhost:5500/recommend_course', 
+        { resource: skillName },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      console.log('Received from backend:', response.data);
+    if (response.data.recommendation) {
+      window.open(response.data.recommendation, '_blank');
+    } else {
+      console.error('No recommendation received');
+    }
+    } catch (error) {
+      console.error('Error sending skill:', error);
+      if (error.response) {
+        console.error('Error details:', error.response.data);
+      }
+    }
+  };
+  
+  
+  
+  
+    
 
   return (
     <div className='min-h-screen flex flex-col bg-gradient-to-r from-blue-900 via-violet-900 to-black'>
@@ -234,7 +263,8 @@ function Analyze() {
                         {skill.name}
                       </span>
                       <a 
-                        href="#" 
+                        //href="#"
+                        onClick={(e) => sendSkillToBackend(e, skill.name)}
                         className={`inline-block ${skill.completed ? 'bg-gray-600' : 'bg-blue-500 hover:bg-blue-600'} text-white text-sm font-bold py-2 px-4 rounded transition-colors duration-300`}
                       >
                         Resource
