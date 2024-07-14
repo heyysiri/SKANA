@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import NavBar from './NavBar';
 import profileImg from '../assets/image.png';
 import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaCode, FaPlus, FaEdit } from 'react-icons/fa';
@@ -7,28 +8,63 @@ import 'react-vertical-timeline-component/style.min.css';
 
 function Profile() {
   const [newSkill, setNewSkill] = useState('');
-  const [skills, setSkills] = useState([
-    { date: "June 2024", title: "Machine Learning" },
-    { date: "January 2024", title: "Docker" },
-    { date: "July 2023", title: "AWS" },
-    { date: "January 2023", title: "Python" },
-    { date: "June 2022", title: "Node.js" },
-    { date: "January 2022", title: "React" }
-  ]);
+  const [skills, setSkills] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [position, setPosition] = useState('Software Developer');
   const [tagline, setTagline] = useState('"Catchy Tagline!"');
+  const [error, setError] = useState(null);
 
-  const addNewSkill = (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    fetchSkills();
+  }, []);
+
+  const fetchSkills = async () => {
+    try {
+      const userString = localStorage.getItem('user');
+      console.log('User string from localStorage:', userString);
+      const user = userString ? JSON.parse(userString) : null;
+      console.log('Parsed user object:', user);
+      
+      if (!user || !user.name) {
+        console.error('User name not found in local storage');
+        return;
+      }
+      
+      console.log('Fetching skills for user:', user.name);
+      const response = await axios.get(`http://localhost:5000/api/skills?name=${encodeURIComponent(user.name)}`);
+      console.log('Skills response:', response.data);
+      
+      if (response.data && Array.isArray(response.data.skills)) {
+        setSkills(response.data.skills);
+      } else {
+        console.error('Unexpected response format:', response.data);
+        setSkills([]);
+      }
+    } catch (error) {
+      console.error('Error fetching skills:', error);
+      setSkills([]);
+    }
+  };
+
+  const addNewSkill = async (e) => {
+    e.preventDefault(); // Prevent form submission
     if (newSkill.trim() !== '') {
-      const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-      const newSkillObject = {
-        date: currentDate,
-        title: newSkill.trim()
-      };
-      setSkills([newSkillObject, ...skills]);
-      setNewSkill('');
+      try {
+        const userString = localStorage.getItem('user');
+        const user = userString ? JSON.parse(userString) : null;
+        if (!user || !user.name) {
+          console.error('User name not found in local storage');
+          return;
+        }
+        const response = await axios.post('http://localhost:5000/api/skills', { 
+          name: user.name, 
+          skill: newSkill.trim() 
+        });
+        setSkills([response.data.skill, ...skills]);
+        setNewSkill('');
+      } catch (error) {
+        console.error('Error adding new skill:', error);
+      }
     }
   };
 
@@ -39,6 +75,10 @@ function Profile() {
   const handleInputBlur = () => {
     setIsEditing(false);
   };
+
+  if (error) {
+    return <div className="text-red-500 text-center mt-10">{error}</div>;
+  }
 
   return (
     <div className='min-h-screen flex flex-col bg-gradient-to-r from-blue-900 via-violet-900 to-black'>
@@ -115,7 +155,6 @@ function Profile() {
           </div>
         </div>
 
-        {/* Timeline */}
         <div className="w-full lg:w-1/2 p-6 bg-black rounded-3xl shadow-2xl border border-yellow-500/30">
           <h3 className="text-4xl font-semibold text-yellow-400 mb-8 font-sans text-center">Timeline</h3>
           <VerticalTimeline layout="1-column" lineColor="rgba(251, 191, 36, 0.3)">
@@ -138,11 +177,15 @@ function Profile() {
                   type="text"
                   value={newSkill}
                   onChange={(e) => setNewSkill(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && addNewSkill(e)}
                   className="w-full p-3 bg-transparent text-yellow-400 text-2l font-bold mb-1 font-sans border-b-2 border-yellow-400 focus:outline-none focus:border-yellow-500 transition-all duration-300"
                   placeholder="Enter new skill"
                 />
-                <p className="text-gray-300 font-sans">Press Enter to add new skill</p>
+                <button 
+                  type="submit" 
+                  className="mt-2 bg-yellow-400 text-black font-bold py-2 px-4 rounded hover:bg-yellow-500 transition-colors duration-300"
+                >
+                  Add Skill
+                </button>
               </form>
             </VerticalTimelineElement>
 

@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
+from bson import ObjectId
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -73,6 +75,48 @@ def login():
         return jsonify({'message': 'Login successful', 'user': user_data}), 200
     else:
         return jsonify({'message': 'Invalid email or password'}), 401
+    
+@app.route('/api/skills', methods=['GET'])
+def get_skills():
+    name = request.args.get('name')
+    if not name:
+        return jsonify({'message': 'Name is required'}), 400
+    
+    user = users_collection.find_one({'name': name})
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+    
+    skills = user.get('skills', [])
+    return jsonify({'skills': skills}), 200
+
+@app.route('/api/skills', methods=['POST'])
+def add_skill():
+    data = request.get_json()
+    name = data.get('name')
+    new_skill = data.get('skill')
+    
+    if not name or not new_skill:
+        return jsonify({'message': 'Name and skill are required'}), 400
+    
+    user = users_collection.find_one({'name': name})
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+    
+    current_date = datetime.now().strftime('%B %Y')
+    skill_object = {
+        'date': current_date,
+        'title': new_skill
+    }
+    
+    result = users_collection.update_one(
+        {'name': name},
+        {'$push': {'skills': skill_object}}
+    )
+    
+    if result.modified_count:
+        return jsonify({'message': 'Skill added successfully', 'skill': skill_object}), 201
+    else:
+        return jsonify({'message': 'Failed to add skill'}), 500
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
