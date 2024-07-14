@@ -9,7 +9,6 @@ import { Radar } from 'react-chartjs-2';
 import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 
-
 const SkillCheckbox = ({ skill, completed, onToggle }) => (
   <div className="flex items-center mb-2">
     <div 
@@ -60,6 +59,23 @@ function Analyze() {
   const [loadingSkills, setLoadingSkills] = useState({});
 
   useEffect(() => {
+    // Load saved data from local storage
+    const savedAnalysisResult = localStorage.getItem('analysisResult');
+    const savedSkills = localStorage.getItem('skills');
+    const savedSkillsData = localStorage.getItem('skillsData');
+    const savedMatchRate = localStorage.getItem('matchRate');
+    const savedMarketFit = localStorage.getItem('marketFit');
+    const savedSkillsToImprove = localStorage.getItem('skillsToImprove');
+
+    if (savedAnalysisResult) {
+      setAnalysisResult(JSON.parse(savedAnalysisResult));
+      setSkills(JSON.parse(savedSkills));
+      setSkillsData(JSON.parse(savedSkillsData));
+      setMatchRate(JSON.parse(savedMatchRate));
+      setMarketFit(JSON.parse(savedMarketFit));
+      setSkillsToImprove(JSON.parse(savedSkillsToImprove));
+    }
+
     const intervalId = setInterval(() => {
       setHighlightedSkill(skills[Math.floor(Math.random() * skills.length)]?.name);
     }, 2000);
@@ -97,33 +113,34 @@ function Analyze() {
         },
       });
 
-      setAnalysisResult(response.data);
+      const newAnalysisResult = response.data;
+      setAnalysisResult(newAnalysisResult);
 
-      const totalRequiredSkills = response.data.skills_required_in_job.length;
-      const matchingSkillsCount = response.data.matching_skills.length;
+      const totalRequiredSkills = newAnalysisResult.skills_required_in_job.length;
+      const matchingSkillsCount = newAnalysisResult.matching_skills.length;
       const newMatchRate = Math.round(((matchingSkillsCount + 1) / totalRequiredSkills) * 100);
       setMatchRate(newMatchRate);
 
-      const skillsToImproveCount = response.data.skills_to_improve.length;
+      const skillsToImproveCount = newAnalysisResult.skills_to_improve.length;
       setSkillsToImprove(skillsToImproveCount);
 
       const newMarketFit = Math.round(((skillsToImproveCount + 1) / totalRequiredSkills) * 100);
       setMarketFit(newMarketFit);
 
-      setSkills(response.data.skills_to_improve.map((skill, index) => ({
+      const newSkills = newAnalysisResult.skills_to_improve.map((skill, index) => ({
         id: index + 1,
         name: skill,
         completed: false,
-      })));
+      }));
+      setSkills(newSkills);
 
-
-      setSkillsData({
-        labels: response.data.skills_required_in_job,
+      const newSkillsData = {
+        labels: newAnalysisResult.skills_required_in_job,
         datasets: [
           {
             label: 'Your Skills',
-            data: response.data.skills_required_in_job.map(skill => 
-              response.data.skills_from_resume.includes(skill) ? 5 : 0
+            data: newAnalysisResult.skills_required_in_job.map(skill => 
+              newAnalysisResult.skills_from_resume.includes(skill) ? 5 : 0
             ),
             backgroundColor: 'rgba(251, 191, 36, 0.2)',
             borderColor: 'rgba(251, 191, 36, 1)',
@@ -131,13 +148,22 @@ function Analyze() {
           },
           {
             label: 'Required Skills',
-            data: response.data.skills_required_in_job.map(() => 5),
+            data: newAnalysisResult.skills_required_in_job.map(() => 5),
             backgroundColor: 'rgba(167, 139, 250, 0.2)',
             borderColor: 'rgba(167, 139, 250, 1)',
             pointBackgroundColor: 'rgba(167, 139, 250, 1)',
           },
         ],
-      });
+      };
+      setSkillsData(newSkillsData);
+
+      // Save data to local storage
+      localStorage.setItem('analysisResult', JSON.stringify(newAnalysisResult));
+      localStorage.setItem('skills', JSON.stringify(newSkills));
+      localStorage.setItem('skillsData', JSON.stringify(newSkillsData));
+      localStorage.setItem('matchRate', JSON.stringify(newMatchRate));
+      localStorage.setItem('marketFit', JSON.stringify(newMarketFit));
+      localStorage.setItem('skillsToImprove', JSON.stringify(skillsToImproveCount));
 
     } catch (error) {
       console.error('Error during analysis:', error);
@@ -148,9 +174,11 @@ function Analyze() {
   };
 
   const toggleSkill = (id) => {
-    setSkills(skills.map(skill => 
+    const updatedSkills = skills.map(skill => 
       skill.id === id ? { ...skill, completed: !skill.completed } : skill
-    ));
+    );
+    setSkills(updatedSkills);
+    localStorage.setItem('skills', JSON.stringify(updatedSkills));
   };
 
   const sendSkillToBackend = async (e, skillName) => {
@@ -177,11 +205,6 @@ function Analyze() {
       setLoadingSkills(prev => ({ ...prev, [skillName]: false }));
     }
   };
-  
-  
-  
-  
-    
 
   return (
     <div className='min-h-screen flex flex-col bg-gradient-to-r from-blue-900 via-violet-900 to-black'>
@@ -268,7 +291,7 @@ function Analyze() {
                       </span>
                       <button 
                         onClick={(e) => sendSkillToBackend(e, skill.name)}
-                        className={`inline-block ${skill.completed ? 'bg-gray-600' : 'bg-blue-500 hover:bg-blue-600'} text-white text-sm font-bold py-2 px-4 rounded transition-colors duration-300 cursor-pointer`}
+                        className={`inline-block ${skill.completed ? 'bg-gray-600' : 'bg-blue-500 hover:bg-blue-600'} text-white text-sm font-bold py-2 px4 rounded transition-colors duration-300 cursor-pointer`}
                         disabled={loadingSkills[skill.name]}
                       >
                         {loadingSkills[skill.name] ? (
@@ -321,12 +344,9 @@ function Analyze() {
             </div>
           </div>
         </div>
-        
       </div>
     </div>
   );
 }
 
-
 export default Analyze;
-
