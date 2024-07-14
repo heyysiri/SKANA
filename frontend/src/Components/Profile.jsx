@@ -1,9 +1,7 @@
-/* eslint-disable react/no-unescaped-entities */
-/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import NavBar from './NavBar';
 import profileImg from '../assets/image.png';
-import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaCode, FaPlus } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaCode, FaPlus, FaEdit } from 'react-icons/fa';
 import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 
@@ -17,6 +15,9 @@ function Profile() {
     { date: "June 2022", title: "Node.js" },
     { date: "January 2022", title: "React" }
   ]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [position, setPosition] = useState('Software Developer');
+  const [tagline, setTagline] = useState('"Catchy Tagline!"');
 
   const addNewSkill = (e) => {
     e.preventDefault();
@@ -31,6 +32,14 @@ function Profile() {
     }
   };
 
+  const handleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleInputBlur = () => {
+    setIsEditing(false);
+  };
+
   return (
     <div className='min-h-screen flex flex-col bg-gradient-to-r from-blue-900 via-violet-900 to-black'>
       <NavBar className="sticky top-0 z-50" />
@@ -38,7 +47,13 @@ function Profile() {
         {/* Profile and Skills section */}
         <div className="w-full lg:w-1/2 space-y-8">
           {/* Profile Box */}
-          <div className="bg-black rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-all duration-300 border border-yellow-500/30 hover:border-yellow-500">
+          <div className="bg-black rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-all duration-300 border border-yellow-500/30 hover:border-yellow-500 relative">
+            <button 
+              onClick={handleEdit}
+              className="absolute top-4 left-4 bg-yellow-400 p-2 rounded-full hover:bg-yellow-500 transition-all duration-300 transform hover:scale-110 shadow-lg"
+            >
+              <FaEdit className="text-black" size={20} />
+            </button>
             <div className="relative w-48 h-48 mx-auto mb-8">
               <img 
                 src={profileImg}
@@ -50,8 +65,29 @@ function Profile() {
               </div>
             </div> 
             <h2 className="text-5xl font-bold text-yellow-400 text-center mb-3 font-sans">Jane Doe</h2>
-            <p className="text-white text-center text-2xl mb-4 font-sans">Software Developer</p>
-            <p className="text-gray-300 text-center italic mb-8 font-sans text-lg">"Catchy Tagline!"</p>
+            {isEditing ? (
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  onBlur={handleInputBlur}
+                  className="w-full bg-transparent text-white text-center text-2xl py-1 px-2 rounded-lg font-sans border-b border-yellow-400 focus:outline-none focus:border-yellow-500"
+                />
+                <input
+                  type="text"
+                  value={tagline}
+                  onChange={(e) => setTagline(e.target.value)}
+                  onBlur={handleInputBlur}
+                  className="w-full bg-transparent text-gray-300 text-center italic py-1 px-2 rounded-lg font-sans text-lg border-b border-yellow-400 focus:outline-none focus:border-yellow-500"
+                />
+              </div>
+            ) : (
+              <>
+                <p className="text-white text-center text-2xl mb-4 font-sans">{position}</p>
+                <p className="text-gray-300 text-center italic mb-8 font-sans text-lg">{tagline}</p>
+              </>
+            )}
             <div className="flex justify-center space-x-6">
               {[FaGithub, FaLinkedin, FaTwitter, FaEnvelope].map((Icon, index) => (
                 <a key={index} href="#" className="bg-gray-800 p-4 rounded-full hover:bg-yellow-400 transition-all duration-300 transform hover:scale-110 shadow-lg">
