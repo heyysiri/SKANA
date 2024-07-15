@@ -381,7 +381,7 @@ def compare_skills(resume_text, job_text):
         print("Response causing the error:", response)
         return {"error": f"Error in skill analysis: {str(e)}"}
 
-@app.route('/recommend_course', methods=['POST'])
+#@app.route('/recommend_course', methods=['POST'])
 def recommend_course_api():
     data = request.json
     skill_name = data.get('resource')
