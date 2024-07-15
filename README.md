@@ -3,6 +3,15 @@
 <p>🚀 Discover the path to your dream job with our cutting-edge Skill Gap Analyzer! 🚀<br>
 Upload your resume and the job description of your desired position, then click "Analyze" to uncover your skill gaps. But that's not all—get personalized upskilling resources to bridge those gaps and boost your career prospects. Let's turn your career aspirations into reality!</p>
 
+<h3>🔑 Create Your .env File:</h3>
+    <p>Create a `.env` file in your project's backend directory to store sensitive information securely.</p>
+    
+    
+    connec_string='your_mongo_uri'
+    groq_api=xxxxxxxx
+   
+
+
 <h3>🛠️ To get started:</h3>
 
 <pre>
